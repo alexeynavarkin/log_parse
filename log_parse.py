@@ -20,7 +20,7 @@ def gen_regexp(ignore_files=False, request_type=None, ignore_www=False, slow_que
     """
     regexp = '{date} "{req_type} {url} \S+" \d+ {p_time}'
     date = '\[(?P<datetime>\d+/\w+/\d+ \d+:\d+:\d+)\]'
-    req_type = '\w+' if request_type is None else '[{}]'.format("|".join(request_type))
+    req_type = '\w+' if request_type is None else '(?:{})'.format("|".join(request_type))
     url_w_ext = r'\w+://{}(?P<url>[\w.]+[^ \t\n\r\f\v]*)'
     url_wo_ext = r'\w+://{}(?P<url>[\w.]+[^ \t\n\r\f\v.]*)'
     url = url_wo_ext if ignore_files else url_w_ext
@@ -31,11 +31,11 @@ def gen_regexp(ignore_files=False, request_type=None, ignore_www=False, slow_que
               'url': url,
               'p_time': p_time}
     regexp = regexp.format(**fields)
-    return(regexp)
+    return regexp
 
 
 def parse(ignore_files=False, ignore_urls=[], start_at=None, stop_at=None,
-          request_type=None, ignore_www=False, slow_queries=False, file_name='log.log'):
+          request_type=None, ignore_www=False, slow_queries=False, file_name="log.log"):
     with open(file_name) as file:
         regexp = gen_regexp(ignore_files, request_type, ignore_www, slow_queries)
         regexp = re.compile(regexp)
